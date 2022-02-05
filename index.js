@@ -1,4 +1,5 @@
 require("dotenv").config();
+require("express-async-errors");
 
 const Joi = require("joi");
 Joi.objectId = require("joi-objectid")(Joi);
@@ -10,7 +11,19 @@ const rentals = require("./routes/rentals");
 const users = require("./routes/users");
 const auth = require("./routes/auth");
 const express = require("express");
+const error = require("./middleware/error");
 const app = express();
+
+// process.on("uncaughtException", ex => {
+//   uncaughtExceptionLogger.error(ex.message);
+// });
+// throw new Error("something error during startup.");
+
+// process.on("unhandledRejection", () => {
+//   console.log("promise rejection error.");
+// });
+// const p = Promise.reject(new Error("something failed miserably."));
+// p.then(() => console.log("Done"));
 
 mongoose
   .connect(process.env.DB_STRIGN, {
@@ -28,6 +41,7 @@ app.use("/api/movies", movies);
 app.use("/api/rentals", rentals);
 app.use("/api/users", users);
 app.use("/api/auth", auth);
+app.use(error);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Listening on port ${port}...`));
